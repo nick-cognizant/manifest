@@ -1,0 +1,135 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "18"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"ui-node"},"name":"ui-node-deployment","namespace":"neuroai-prod"},"spec":{"progressDeadlineSeconds":360,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"ui-node"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"labels":{"app":"ui-node"}},"spec":{"automountServiceAccountToken":true,"containers":[{"env":[{"name":"IP_PORT","value":"0.0.0.0:3000"},{"name":"MD_SERVER_URL","value":"https://gateway-prod.unileaf.evolution.ml:30002"},{"name":"DEBUG","value":"*,-send,-compression,-babel"},{"name":"AUTH0_CLIENT_ID","valueFrom":{"secretKeyRef":{"key":"AUTH0_CLIENT_ID","name":"auth0-authentication-prod"}}},{"name":"AUTH0_CLIENT_SECRET","valueFrom":{"secretKeyRef":{"key":"AUTH0_CLIENT_SECRET","name":"auth0-authentication-prod"}}},{"name":"AUTH0_ISSUER","valueFrom":{"secretKeyRef":{"key":"AUTH0_ISSUER","name":"auth0-authentication-prod"}}},{"name":"AUTH0_DOMAIN","valueFrom":{"secretKeyRef":{"key":"AUTH0_DOMAIN","name":"auth0-authentication-prod"}}},{"name":"NEXTAUTH_SECRET","valueFrom":{"secretKeyRef":{"key":"NEXTAUTH_SECRET","name":"nextauth-prod"}}},{"name":"NEXTAUTH_URL","value":"https://neuro-ai.evolution.ml"}],"envFrom":[{"configMapRef":{"name":"ui-node-env"}}],"image":"634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-ui-node:71d34edd70d7a6f7185fe9922e913229c3fa3439_production","imagePullPolicy":"IfNotPresent","name":"ui-node-server","resources":{"limits":{"cpu":"1","memory":"6Gi"}},"terminationMessagePath":"/prod/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/app/.env.local","name":"env-local","readOnly":true,"subPath":".env.local"}]}],"dnsPolicy":"ClusterFirst","nodeSelector":{"kubernetes.io/os":"linux"},"restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"serviceAccount":"unileaf-account","serviceAccountName":"unileaf-account","terminationGracePeriodSeconds":30,"volumes":[{"name":"env-local","secret":{"defaultMode":420,"items":[{"key":"NEXTAUTH_SECRET","path":"NEXTAUTH_SECRET"},{"key":"ENABLE_AUTHENTICATION","path":"ENABLE_AUTHENTICATION"}],"optional":false,"secretName":"nextauth-prod"}}]}}}}
+  creationTimestamp: "2023-06-01T14:54:34Z"
+  generation: 18
+  labels:
+    app: ui-node
+  name: ui-node-deployment
+  namespace: neuroai-prod
+  resourceVersion: "121751339"
+  uid: 20da1ed6-c3ff-4686-b282-91d67f1e3ab6
+spec:
+  progressDeadlineSeconds: 360
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: ui-node
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2023-10-20T21:43:17Z"
+      creationTimestamp: null
+      labels:
+        app: ui-node
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - env:
+        - name: IP_PORT
+          value: 0.0.0.0:3000
+        - name: DEBUG
+          value: '*,-send,-compression,-babel'
+        - name: AUTH0_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              key: AUTH0_CLIENT_ID
+              name: auth0-authentication-prod
+        - name: AUTH0_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: AUTH0_CLIENT_SECRET
+              name: auth0-authentication-prod
+        - name: AUTH0_ISSUER
+          valueFrom:
+            secretKeyRef:
+              key: AUTH0_ISSUER
+              name: auth0-authentication-prod
+        - name: AUTH0_DOMAIN
+          valueFrom:
+            secretKeyRef:
+              key: AUTH0_DOMAIN
+              name: auth0-authentication-prod
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: OPENAI_API_KEY
+              name: openai-key
+        - name: PINECONE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: PINECONE_API_KEY
+              name: pinecone-key
+        - name: NEXTAUTH_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: NEXTAUTH_SECRET
+              name: nextauth-prod
+        - name: NEXTAUTH_URL
+          value: https://neuro-ai.evolution.ml
+        envFrom:
+        - configMapRef:
+            name: ui-node-env
+        image: 634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-ui-node:1.4.13_production_neuroai_cluster
+        imagePullPolicy: IfNotPresent
+        name: ui-node-server
+        resources:
+          limits:
+            cpu: "1"
+            memory: 6Gi
+        terminationMessagePath: /prod/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /app/.env.local
+          name: env-local
+          readOnly: true
+          subPath: .env.local
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/os: linux
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: unileaf-account
+      serviceAccountName: unileaf-account
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: env-local
+        secret:
+          defaultMode: 420
+          items:
+          - key: NEXTAUTH_SECRET
+            path: NEXTAUTH_SECRET
+          - key: ENABLE_AUTHENTICATION
+            path: ENABLE_AUTHENTICATION
+          optional: false
+          secretName: nextauth-prod
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2023-06-08T21:53:35Z"
+    lastUpdateTime: "2023-06-08T21:53:35Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2023-10-20T21:03:44Z"
+    lastUpdateTime: "2023-11-15T23:01:38Z"
+    message: ReplicaSet "ui-node-deployment-766657466" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 18
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

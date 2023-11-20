@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "11"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"metadata-gateway-server"},"name":"metadata-gateway-deployment","namespace":"neuroai-prod"},"spec":{"progressDeadlineSeconds":360,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"metadata-gateway-server"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"labels":{"app":"metadata-gateway-server"}},"spec":{"automountServiceAccountToken":true,"containers":[{"envFrom":[{"configMapRef":{"name":"metadata-gateway-env"}}],"image":"634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-gateway-mdserver:6579d0c5e3c2a7a4f9ffc108ee1f89b5069ef055","imagePullPolicy":"Always","name":"metadata-gateway-server","resources":{"limits":{"cpu":"1","memory":"8Gi"}},"terminationMessagePath":"/prod/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/tmp","name":"tmp-volume"}]}],"dnsPolicy":"ClusterFirst","nodeSelector":{"kubernetes.io/os":"linux"},"restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"serviceAccount":"unileaf-account","serviceAccountName":"unileaf-account","terminationGracePeriodSeconds":30,"volumes":[{"emptyDir":{"sizeLimit":"5Gi"},"name":"tmp-volume"}]}}}}
+  creationTimestamp: "2023-06-01T14:54:32Z"
+  generation: 11
+  labels:
+    app: metadata-gateway-server
+  name: metadata-gateway-deployment
+  namespace: neuroai-prod
+  resourceVersion: "121751322"
+  uid: 821da137-0268-483a-a7f3-fea9090b3f23
+spec:
+  progressDeadlineSeconds: 360
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: metadata-gateway-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: metadata-gateway-server
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: metadata-gateway-env
+        image: 634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-gateway-mdserver:1.4.13
+        imagePullPolicy: Always
+        name: metadata-gateway-server
+        resources:
+          limits:
+            cpu: "1"
+            memory: 8Gi
+        terminationMessagePath: /prod/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/os: linux
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: unileaf-account
+      serviceAccountName: unileaf-account
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir:
+          sizeLimit: 5Gi
+        name: tmp-volume
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2023-06-01T14:54:51Z"
+    lastUpdateTime: "2023-06-01T14:54:51Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2023-10-20T21:03:46Z"
+    lastUpdateTime: "2023-11-15T23:01:38Z"
+    message: ReplicaSet "metadata-gateway-deployment-698f975f69" has successfully
+      progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 11
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

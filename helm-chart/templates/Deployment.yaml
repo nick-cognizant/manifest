@@ -1,0 +1,694 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: analytics-chat-server
+  name: analytics-chat-server-deployment
+  namespace: '{{ .Values.global.namespace }}'
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: analytics-chat-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations: {}
+      labels:
+        app: analytics-chat-server
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - env:
+        - name: AWS_BUCKET
+          value: leaf-unileaf-production-artifacts
+        - name: AWS_REGION
+          value: us-west-2
+        - name: AWS_DEFAULT_REGION
+          value: us-west-2
+        image: '{{ .Values.deployments.analyticsChatServer.image }}'
+        imagePullPolicy: Always
+        name: '{{ .Values.deployments.analyticsChatServer.name }}'
+        resources:
+          limits:
+            cpu: '1'
+            memory: 8Gi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
+        - mountPath: /config
+          name: config-volume
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/os: linux
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: unileaf-account
+      serviceAccountName: unileaf-account
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir:
+          sizeLimit: 10Gi
+        name: tmp-volume
+      - emptyDir:
+          sizeLimit: 5Gi
+        name: config-volume
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: data-profiler-server
+  name: data-profiler-server-deployment
+  namespace: '{{ .Values.global.namespace }}'
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: data-profiler-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: data-profiler-server
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - env:
+        - name: DATA_PROFILER_PORT
+          value: 0.0.0.0:30004
+        - name: AWS_BUCKET
+          value: leaf-unileaf-production-artifacts
+        - name: AWS_REGION
+          value: us-west-2
+        - name: AWS_SHARED_CREDENTIALS_FILE
+          value: /go/.aws/credentials
+        - name: AWS_CONFIG_FILE
+          value: /go/.aws/config
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              key: aws_access_key_id
+              name: aws-secret
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: aws_secret_access_key
+              name: aws-secret
+        - name: AWS_DEFAULT_REGION
+          value: us-west-2
+        image: '{{ .Values.deployments.dataProfilerServer.image }}'
+        imagePullPolicy: Always
+        name: '{{ .Values.deployments.dataProfilerServer.name }}'
+        resources:
+          limits:
+            cpu: '1'
+            memory: 8Gi
+        terminationMessagePath: /prod/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /go/.aws
+          name: aws-creds
+          readOnly: true
+        - mountPath: /tmp
+          name: tmp-volume
+        - mountPath: /config
+          name: config-volume
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/os: linux
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: unileaf-account
+      serviceAccountName: unileaf-account
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: aws-creds
+        secret:
+          defaultMode: 420
+          items:
+          - key: credentials
+            path: credentials
+          - key: config
+            path: config
+          optional: false
+          secretName: unileaf-aws-creds
+      - emptyDir:
+          sizeLimit: 10Gi
+        name: tmp-volume
+      - emptyDir:
+          sizeLimit: 5Gi
+        name: config-volume
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: metadata-gateway-server
+  name: metadata-gateway-deployment
+  namespace: '{{ .Values.global.namespace }}'
+spec:
+  progressDeadlineSeconds: 360
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: metadata-gateway-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: metadata-gateway-server
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: metadata-gateway-env
+        image: '{{ .Values.deployments.metadataGateway.image }}'
+        imagePullPolicy: Always
+        name: '{{ .Values.deployments.metadataGateway.name }}'
+        resources:
+          limits:
+            cpu: '1'
+            memory: 8Gi
+        terminationMessagePath: /prod/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/os: linux
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: unileaf-account
+      serviceAccountName: unileaf-account
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir:
+          sizeLimit: 5Gi
+        name: tmp-volume
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: metadata-server
+  name: metadata-server-deployment
+  namespace: '{{ .Values.global.namespace }}'
+spec:
+  progressDeadlineSeconds: 360
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: metadata-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations: {}
+      labels:
+        app: metadata-server
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - env:
+        - name: IP_PORT
+          value: '30001'
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: db-username
+              name: db-creds
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: db-password
+              name: db-creds
+        envFrom:
+        - configMapRef:
+            name: mdserver-common-env
+        image: '{{ .Values.deployments.metadataServer.image }}'
+        imagePullPolicy: Always
+        name: '{{ .Values.deployments.metadataServer.name }}'
+        resources:
+          limits:
+            cpu: '1'
+            memory: 8Gi
+        terminationMessagePath: /prod/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /go/.aws
+          name: aws-creds
+          readOnly: true
+        - mountPath: /tmp
+          name: tmp-volume
+        - mountPath: /config
+          name: config-volume
+        - mountPath: /api-config
+          name: config-apiswitch
+      - env:
+        - name: IP_PORT
+          value: 0.0.0.0:30009
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: db-username
+              name: db-creds
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: db-password
+              name: db-creds
+        envFrom:
+        - configMapRef:
+            name: mdserver-common-env
+        image: '{{ .Values.deployments.metadataServer.image }}'
+        imagePullPolicy: Always
+        name: '{{ .Values.deployments.metadataServer.name }}'
+        resources:
+          limits:
+            cpu: '1'
+            memory: 8Gi
+        terminationMessagePath: /prod/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /go/.aws
+          name: aws-creds
+          readOnly: true
+        - mountPath: /tmp
+          name: tmp-volume
+        - mountPath: /config
+          name: config-volume
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/os: linux
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: unileaf-account
+      serviceAccountName: unileaf-account
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: aws-creds
+        secret:
+          defaultMode: 420
+          items:
+          - key: credentials
+            path: credentials
+          - key: config
+            path: config
+          optional: false
+          secretName: unileaf-aws-creds
+      - emptyDir:
+          sizeLimit: 10Gi
+        name: tmp-volume
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: prod-superusers.json
+            path: prod-superusers.json
+          name: prod-superusers
+        name: config-volume
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: apiswitch.json
+            path: apiswitch.json
+          name: config-apiswitch
+        name: config-apiswitch
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: run-submission-server
+  name: run-submission-server-deployment
+  namespace: '{{ .Values.global.namespace }}'
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: run-submission-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations: {}
+      labels:
+        app: run-submission-server
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - env:
+        - name: IP_PORT
+          value: 0.0.0.0:30004
+        - name: AWS_BUCKET
+          value: leaf-unileaf-production-artifacts
+        - name: AWS_REGION
+          value: us-west-2
+        - name: UNILEAF_USER
+          value: unileaf-production
+        - name: UNILEAF_WORK_QUEUE
+          value: sqs_studioml_gorunner_cpu_production
+        - name: MD_SERVER_HOST
+          value: metadata-service
+        - name: MD_SERVER_PORT
+          value: '30001'
+        - name: AWS_SHARED_CREDENTIALS_FILE
+          value: /go/.aws/credentials
+        - name: AWS_CONFIG_FILE
+          value: /go/.aws/config
+        - name: ESP_SERVICE_USER
+          valueFrom:
+            secretKeyRef:
+              key: auth0-username
+              name: auth0-creds
+        - name: ESP_SERVICE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: auth0-password
+              name: auth0-creds
+        - name: LEAF_SOURCE_CREDENTIALS
+          valueFrom:
+            secretKeyRef:
+              key: leaf-creds
+              name: leaf-token
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              key: aws_access_key_id
+              name: aws-secret
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: aws_secret_access_key
+              name: aws-secret
+        - name: AWS_DEFAULT_REGION
+          value: us-west-2
+        - name: MD_ARTIFACTS_BUCKET
+          value: leaf-unileaf-production-artifacts
+        - name: STUDIO_DATABASE_ENDPOINT
+          value: http://s3-us-west-2.amazonaws.com/
+        - name: STUDIO_DATABASE_TYPE
+          value: s3
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: OPENAI_API_KEY
+              name: openai-key
+        envFrom:
+        - configMapRef:
+            name: run-submission-server-env
+        image: '{{ .Values.deployments.runSubmissionServer.image }}'
+        imagePullPolicy: Always
+        name: '{{ .Values.deployments.runSubmissionServer.name }}'
+        resources:
+          limits:
+            cpu: '1'
+            memory: 8Gi
+        terminationMessagePath: /prod/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /go/.aws
+          name: aws-creds
+          readOnly: true
+        - mountPath: /tmp
+          name: tmp-volume
+        - mountPath: /config
+          name: config-volume
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/os: linux
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: unileaf-account
+      serviceAccountName: unileaf-account
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: aws-creds
+        secret:
+          defaultMode: 420
+          items:
+          - key: credentials
+            path: credentials
+          - key: config
+            path: config
+          optional: false
+          secretName: unileaf-aws-creds
+      - emptyDir:
+          sizeLimit: 10Gi
+        name: tmp-volume
+      - emptyDir:
+          sizeLimit: 5Gi
+        name: config-volume
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: secrets-manager
+  name: secrets-manager-deployment
+  namespace: '{{ .Values.global.namespace }}'
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: secrets-manager
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: secrets-manager
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - image: '{{ .Values.deployments.secretsManager.image }}'
+        imagePullPolicy: Always
+        name: '{{ .Values.deployments.secretsManager.name }}'
+        resources:
+          limits:
+            cpu: '1'
+            memory: 8Gi
+        terminationMessagePath: /prod/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/os: linux
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: unileaf-account
+      serviceAccountName: unileaf-account
+      terminationGracePeriodSeconds: 30
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: serving-adapter
+  name: serving-adapter-deployment
+  namespace: '{{ .Values.global.namespace }}'
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: serving-adapter
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'false'
+      labels:
+        app: serving-adapter
+    spec:
+      containers:
+      - args:
+        - --env_config_path
+        - /usr/local/config/config.json
+        - --grpc_port
+        - '30005'
+        image: '{{ .Values.deployments.servingAdapter.image }}'
+        imagePullPolicy: IfNotPresent
+        name: '{{ .Values.deployments.servingAdapter.name }}'
+        ports:
+        - name: '{{ index .Values.deployments.servingAdapter.ports 0 "name" }}'
+          containerPort: '{{ index .Values.deployments.servingAdapter.ports 0 "containerPort"
+            }}'
+        resources: {}
+        terminationMessagePath: /prod/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /usr/local/config
+          name: serving-adapter-config-volume
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: serving-adapter-service-account
+      serviceAccountName: serving-adapter-service-account
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: serving-adapter-config
+        name: serving-adapter-config-volume
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ui-node
+  name: ui-node-deployment
+  namespace: '{{ .Values.global.namespace }}'
+spec:
+  progressDeadlineSeconds: 360
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: ui-node
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations: {}
+      labels:
+        app: ui-node
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - env:
+        - name: IP_PORT
+          value: 0.0.0.0:3000
+        - name: DEBUG
+          value: '*,-send,-compression,-babel'
+        - name: AUTH0_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              key: AUTH0_CLIENT_ID
+              name: auth0-authentication-prod
+        - name: AUTH0_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: AUTH0_CLIENT_SECRET
+              name: auth0-authentication-prod
+        - name: AUTH0_ISSUER
+          valueFrom:
+            secretKeyRef:
+              key: AUTH0_ISSUER
+              name: auth0-authentication-prod
+        - name: AUTH0_DOMAIN
+          valueFrom:
+            secretKeyRef:
+              key: AUTH0_DOMAIN
+              name: auth0-authentication-prod
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: OPENAI_API_KEY
+              name: openai-key
+        - name: PINECONE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: PINECONE_API_KEY
+              name: pinecone-key
+        - name: NEXTAUTH_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: NEXTAUTH_SECRET
+              name: nextauth-prod
+        - name: NEXTAUTH_URL
+          value: https://neuro-ai.evolution.ml
+        envFrom:
+        - configMapRef:
+            name: ui-node-env
+        image: '{{ .Values.deployments.uiNode.image }}'
+        imagePullPolicy: IfNotPresent
+        name: '{{ .Values.deployments.uiNode.name }}'
+        resources:
+          limits:
+            cpu: '1'
+            memory: 6Gi
+        terminationMessagePath: /prod/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /app/.env.local
+          name: env-local
+          readOnly: true
+          subPath: .env.local
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/os: linux
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: unileaf-account
+      serviceAccountName: unileaf-account
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: env-local
+        secret:
+          defaultMode: 420
+          items:
+          - key: NEXTAUTH_SECRET
+            path: NEXTAUTH_SECRET
+          - key: ENABLE_AUTHENTICATION
+            path: ENABLE_AUTHENTICATION
+          optional: false
+          secretName: nextauth-prod

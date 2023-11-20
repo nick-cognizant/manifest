@@ -1,0 +1,121 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "10"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"data-profiler-server"},"name":"data-profiler-server-deployment","namespace":"neuroai-prod"},"spec":{"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"data-profiler-server"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"data-profiler-server"}},"spec":{"automountServiceAccountToken":true,"containers":[{"env":[{"name":"DATA_PROFILER_PORT","value":"0.0.0.0:30004"},{"name":"AWS_BUCKET","value":"leaf-unileaf-production-artifacts"},{"name":"AWS_REGION","value":"us-west-2"},{"name":"AWS_SHARED_CREDENTIALS_FILE","value":"/go/.aws/credentials"},{"name":"AWS_CONFIG_FILE","value":"/go/.aws/config"},{"name":"AWS_ACCESS_KEY_ID","valueFrom":{"secretKeyRef":{"key":"aws_access_key_id","name":"aws-secret"}}},{"name":"AWS_SECRET_ACCESS_KEY","valueFrom":{"secretKeyRef":{"key":"aws_secret_access_key","name":"aws-secret"}}},{"name":"AWS_DEFAULT_REGION","value":"us-west-2"}],"image":"634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-data-profiler:6579d0c5e3c2a7a4f9ffc108ee1f89b5069ef055","imagePullPolicy":"Always","name":"data-profiler-server","resources":{"limits":{"cpu":"1","memory":"8Gi"}},"terminationMessagePath":"/prod/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/go/.aws","name":"aws-creds","readOnly":true},{"mountPath":"/tmp","name":"tmp-volume"},{"mountPath":"/config","name":"config-volume"}]}],"dnsPolicy":"ClusterFirst","nodeSelector":{"kubernetes.io/os":"linux"},"restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"serviceAccount":"unileaf-account","serviceAccountName":"unileaf-account","terminationGracePeriodSeconds":30,"volumes":[{"name":"aws-creds","secret":{"defaultMode":420,"items":[{"key":"credentials","path":"credentials"},{"key":"config","path":"config"}],"optional":false,"secretName":"unileaf-aws-creds"}},{"emptyDir":{"sizeLimit":"10Gi"},"name":"tmp-volume"},{"emptyDir":{"sizeLimit":"5Gi"},"name":"config-volume"}]}}}}
+  creationTimestamp: "2023-06-01T14:54:32Z"
+  generation: 10
+  labels:
+    app: data-profiler-server
+  name: data-profiler-server-deployment
+  namespace: neuroai-prod
+  resourceVersion: "121751886"
+  uid: 944ff067-3117-423d-adaf-7d39d0de7666
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: data-profiler-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: data-profiler-server
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - env:
+        - name: DATA_PROFILER_PORT
+          value: 0.0.0.0:30004
+        - name: AWS_BUCKET
+          value: leaf-unileaf-production-artifacts
+        - name: AWS_REGION
+          value: us-west-2
+        - name: AWS_SHARED_CREDENTIALS_FILE
+          value: /go/.aws/credentials
+        - name: AWS_CONFIG_FILE
+          value: /go/.aws/config
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              key: aws_access_key_id
+              name: aws-secret
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: aws_secret_access_key
+              name: aws-secret
+        - name: AWS_DEFAULT_REGION
+          value: us-west-2
+        image: 634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-data-profiler:1.4.13
+        imagePullPolicy: Always
+        name: data-profiler-server
+        resources:
+          limits:
+            cpu: "1"
+            memory: 8Gi
+        terminationMessagePath: /prod/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /go/.aws
+          name: aws-creds
+          readOnly: true
+        - mountPath: /tmp
+          name: tmp-volume
+        - mountPath: /config
+          name: config-volume
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/os: linux
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: unileaf-account
+      serviceAccountName: unileaf-account
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: aws-creds
+        secret:
+          defaultMode: 420
+          items:
+          - key: credentials
+            path: credentials
+          - key: config
+            path: config
+          optional: false
+          secretName: unileaf-aws-creds
+      - emptyDir:
+          sizeLimit: 10Gi
+        name: tmp-volume
+      - emptyDir:
+          sizeLimit: 5Gi
+        name: config-volume
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2023-06-01T14:54:32Z"
+    lastUpdateTime: "2023-06-01T14:54:32Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2023-10-20T21:03:47Z"
+    lastUpdateTime: "2023-11-15T23:02:41Z"
+    message: ReplicaSet "data-profiler-server-deployment-648dfbc578" has successfully
+      progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 10
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

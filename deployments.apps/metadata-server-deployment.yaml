@@ -1,0 +1,161 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "20"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"metadata-server"},"name":"metadata-server-deployment","namespace":"neuroai-prod"},"spec":{"progressDeadlineSeconds":360,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"metadata-server"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"labels":{"app":"metadata-server"}},"spec":{"automountServiceAccountToken":true,"containers":[{"env":[{"name":"IP_PORT","value":"30001"},{"name":"DB_USERNAME","valueFrom":{"secretKeyRef":{"key":"db-username","name":"db-creds"}}},{"name":"DB_PASSWORD","valueFrom":{"secretKeyRef":{"key":"db-password","name":"db-creds"}}}],"envFrom":[{"configMapRef":{"name":"mdserver-common-env"}}],"image":"634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-python-mdserver:6579d0c5e3c2a7a4f9ffc108ee1f89b5069ef055","imagePullPolicy":"Always","name":"pmetadata-server","resources":{"limits":{"cpu":"1","memory":"8Gi"}},"terminationMessagePath":"/prod/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/go/.aws","name":"aws-creds","readOnly":true},{"mountPath":"/tmp","name":"tmp-volume"},{"mountPath":"/config","name":"config-volume"},{"mountPath":"/api-config","name":"config-apiswitch"}]},{"env":[{"name":"IP_PORT","value":"0.0.0.0:30009"},{"name":"DB_USERNAME","valueFrom":{"secretKeyRef":{"key":"db-username","name":"db-creds"}}},{"name":"DB_PASSWORD","valueFrom":{"secretKeyRef":{"key":"db-password","name":"db-creds"}}}],"envFrom":[{"configMapRef":{"name":"mdserver-common-env"}}],"image":"634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-mdserver:6579d0c5e3c2a7a4f9ffc108ee1f89b5069ef055","imagePullPolicy":"Always","name":"metadata-server","resources":{"limits":{"cpu":"1","memory":"8Gi"}},"terminationMessagePath":"/prod/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/go/.aws","name":"aws-creds","readOnly":true},{"mountPath":"/tmp","name":"tmp-volume"},{"mountPath":"/config","name":"config-volume"}]}],"dnsPolicy":"ClusterFirst","nodeSelector":{"kubernetes.io/os":"linux"},"restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"serviceAccount":"unileaf-account","serviceAccountName":"unileaf-account","terminationGracePeriodSeconds":30,"volumes":[{"name":"aws-creds","secret":{"defaultMode":420,"items":[{"key":"credentials","path":"credentials"},{"key":"config","path":"config"}],"optional":false,"secretName":"unileaf-aws-creds"}},{"emptyDir":{"sizeLimit":"10Gi"},"name":"tmp-volume"},{"configMap":{"items":[{"key":"prod-superusers.json","path":"prod-superusers.json"}],"name":"prod-superusers"},"name":"config-volume"},{"configMap":{"defaultMode":420,"items":[{"key":"apiswitch.json","path":"apiswitch.json"}],"name":"config-apiswitch"},"name":"config-apiswitch"}]}}}}
+  creationTimestamp: "2023-06-01T14:54:32Z"
+  generation: 20
+  labels:
+    app: metadata-server
+  name: metadata-server-deployment
+  namespace: neuroai-prod
+  resourceVersion: "121751997"
+  uid: 43f06689-1963-4055-9821-0ab8e431afc2
+spec:
+  progressDeadlineSeconds: 360
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: metadata-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2023-10-30T20:56:19Z"
+      creationTimestamp: null
+      labels:
+        app: metadata-server
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - env:
+        - name: IP_PORT
+          value: "30001"
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: db-username
+              name: db-creds
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: db-password
+              name: db-creds
+        envFrom:
+        - configMapRef:
+            name: mdserver-common-env
+        image: 634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-python-mdserver:1.4.13
+        imagePullPolicy: Always
+        name: pmetadata-server
+        resources:
+          limits:
+            cpu: "1"
+            memory: 8Gi
+        terminationMessagePath: /prod/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /go/.aws
+          name: aws-creds
+          readOnly: true
+        - mountPath: /tmp
+          name: tmp-volume
+        - mountPath: /config
+          name: config-volume
+        - mountPath: /api-config
+          name: config-apiswitch
+      - env:
+        - name: IP_PORT
+          value: 0.0.0.0:30009
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: db-username
+              name: db-creds
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: db-password
+              name: db-creds
+        envFrom:
+        - configMapRef:
+            name: mdserver-common-env
+        image: 634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-mdserver:1.4.13
+        imagePullPolicy: Always
+        name: metadata-server
+        resources:
+          limits:
+            cpu: "1"
+            memory: 8Gi
+        terminationMessagePath: /prod/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /go/.aws
+          name: aws-creds
+          readOnly: true
+        - mountPath: /tmp
+          name: tmp-volume
+        - mountPath: /config
+          name: config-volume
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/os: linux
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: unileaf-account
+      serviceAccountName: unileaf-account
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: aws-creds
+        secret:
+          defaultMode: 420
+          items:
+          - key: credentials
+            path: credentials
+          - key: config
+            path: config
+          optional: false
+          secretName: unileaf-aws-creds
+      - emptyDir:
+          sizeLimit: 10Gi
+        name: tmp-volume
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: prod-superusers.json
+            path: prod-superusers.json
+          name: prod-superusers
+        name: config-volume
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: apiswitch.json
+            path: apiswitch.json
+          name: config-apiswitch
+        name: config-apiswitch
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2023-06-01T14:56:50Z"
+    lastUpdateTime: "2023-06-01T14:56:50Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2023-10-20T21:03:45Z"
+    lastUpdateTime: "2023-11-15T23:02:50Z"
+    message: ReplicaSet "metadata-server-deployment-6f66f9" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 20
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

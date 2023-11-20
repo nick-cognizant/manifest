@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "24"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"serving-adapter"},"name":"serving-adapter-deployment","namespace":"neuroai-prod"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"serving-adapter"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"annotations":{"sidecar.istio.io/rewriteAppHTTPProbers":"false"},"labels":{"app":"serving-adapter"}},"spec":{"containers":[{"args":["--env_config_path","/usr/local/config/config.json","--grpc_port","30005"],"image":"634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-serving-adapter:1.2.25","imagePullPolicy":"IfNotPresent","name":"serving-adapter","ports":[{"containerPort":30005,"name":"adapter-grpc","protocol":"TCP"}],"resources":{},"terminationMessagePath":"/prod/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/usr/local/config","name":"serving-adapter-config-volume","readOnly":true}]}],"dnsPolicy":"ClusterFirst","restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"serviceAccount":"serving-adapter-service-account","serviceAccountName":"serving-adapter-service-account","terminationGracePeriodSeconds":30,"volumes":[{"configMap":{"defaultMode":420,"name":"serving-adapter-config"},"name":"serving-adapter-config-volume"}]}}}}
+  creationTimestamp: "2023-06-09T20:40:19Z"
+  generation: 24
+  labels:
+    app: serving-adapter
+  name: serving-adapter-deployment
+  namespace: neuroai-prod
+  resourceVersion: "121751769"
+  uid: 3db6acd8-ee26-4eae-975c-bf400ecc96e6
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: serving-adapter
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2023-10-26T21:26:22Z"
+        sidecar.istio.io/rewriteAppHTTPProbers: "false"
+      creationTimestamp: null
+      labels:
+        app: serving-adapter
+    spec:
+      containers:
+      - args:
+        - --env_config_path
+        - /usr/local/config/config.json
+        - --grpc_port
+        - "30005"
+        image: 634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-serving-adapter:1.4.13
+        imagePullPolicy: IfNotPresent
+        name: serving-adapter
+        ports:
+        - containerPort: 30005
+          name: adapter-grpc
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /prod/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /usr/local/config
+          name: serving-adapter-config-volume
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: serving-adapter-service-account
+      serviceAccountName: serving-adapter-service-account
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: serving-adapter-config
+        name: serving-adapter-config-volume
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2023-09-20T23:38:05Z"
+    lastUpdateTime: "2023-09-20T23:38:05Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2023-10-20T21:03:47Z"
+    lastUpdateTime: "2023-11-15T23:02:28Z"
+    message: ReplicaSet "serving-adapter-deployment-64789c574" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 24
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

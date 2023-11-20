@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"ui-node-service","namespace":"neuroai-prod"},"spec":{"ports":[{"port":3000,"protocol":"TCP","targetPort":3000}],"selector":{"app":"ui-node"},"sessionAffinity":"None","type":"ClusterIP"}}
+  creationTimestamp: "2023-05-16T23:22:37Z"
+  name: ui-node-service
+  namespace: neuroai-prod
+  resourceVersion: "9357"
+  uid: 69819b79-3a75-4510-8013-3a4034c4f793
+spec:
+  clusterIP: 10.100.112.219
+  clusterIPs:
+  - 10.100.112.219
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 3000
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app: ui-node
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

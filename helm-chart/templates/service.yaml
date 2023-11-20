@@ -1,0 +1,124 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  name: '{{ .Values.services.dataProfilerService.name }}'
+  namespace: '{{ .Values.global.namespace }}'
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: '{{ index .Values.services.dataProfilerService.ports 0 "port" }}'
+    protocol: '{{ index  .Values.services.dataProfilerService.ports 0  "protocol" }}'
+    targetPort: '{{ index  .Values.services.dataProfilerService.ports 0 "targetPort" }}'
+  selector:
+    app: data-profiler-server
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  name: '{{ .Values.services.metadataGatewayService.name }}'
+  namespace: '{{ .Values.global.namespace }}'
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: '{{ index  .Values.services.metadataGatewayService.ports 0 "port" }}'
+    protocol: '{{ index  .Values.services.metadataGatewayService.ports 0 "protocol" }}'
+    targetPort: '{{ index  .Values.services.metadataGatewayService.ports 0 "targetPort" }}'
+  selector:
+    app: metadata-gateway-server
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  name: '{{ .Values.services.metadataService.name }}'
+  namespace: '{{ .Values.global.namespace }}'
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: '{{ index  .Values.services.metadataService.ports 0 "port" }}'
+    protocol: '{{ index  .Values.services.metadataService.ports 0 "protocol" }}'
+    targetPort: '{{ index  .Values.services.metadataService.ports 0 "targetPort" }}'
+  selector:
+    app: metadata-server
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  name: '{{ .Values.services.runSubmissionService.name }}'
+  namespace: '{{ .Values.global.namespace }}'
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: '{{ index  .Values.services.runSubmissionService.ports 0 "port" }}'
+    protocol: '{{ index  .Values.services.runSubmissionService.ports 0 "protocol" }}'
+    targetPort: '{{ index  .Values.services.runSubmissionService.ports 0 "targetPort" }}'
+  selector:
+    app: run-submission-server
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  name: serving-adapter-svc
+  namespace: neuroai-prod
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 30005
+    protocol: TCP
+    targetPort: adapter-grpc
+  selector:
+    app: serving-adapter
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  name: '{{ index  .Values.services.uiNodeService.name }}'
+  namespace: '{{ index  .Values.global.namespace }}'
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: '{{ index  .Values.services.uiNodeService.ports 0 "port" }}'
+    protocol: '{{ index  .Values.services.uiNodeService.ports 0 "protocol" }}'
+    targetPort: '{{ index  .Values.services.uiNodeService.ports 0 "targetPort" }}'
+  selector:
+    app: ui-node
+  sessionAffinity: None
+  type: ClusterIP

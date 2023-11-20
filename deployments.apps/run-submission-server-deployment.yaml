@@ -1,0 +1,160 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "17"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"run-submission-server"},"name":"run-submission-server-deployment","namespace":"neuroai-prod"},"spec":{"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"run-submission-server"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"labels":{"app":"run-submission-server"}},"spec":{"automountServiceAccountToken":true,"containers":[{"env":[{"name":"IP_PORT","value":"0.0.0.0:30004"},{"name":"AWS_BUCKET","value":"leaf-unileaf-production-artifacts"},{"name":"AWS_REGION","value":"us-west-2"},{"name":"UNILEAF_USER","value":"unileaf-production"},{"name":"UNILEAF_WORK_QUEUE","value":"sqs_studioml_gorunner_cpu_production"},{"name":"MD_SERVER_HOST","value":"metadata-service"},{"name":"MD_SERVER_PORT","value":"30001"},{"name":"AWS_SHARED_CREDENTIALS_FILE","value":"/go/.aws/credentials"},{"name":"AWS_CONFIG_FILE","value":"/go/.aws/config"},{"name":"ESP_SERVICE_USER","valueFrom":{"secretKeyRef":{"key":"auth0-username","name":"auth0-creds"}}},{"name":"ESP_SERVICE_PASSWORD","valueFrom":{"secretKeyRef":{"key":"auth0-password","name":"auth0-creds"}}},{"name":"LEAF_SOURCE_CREDENTIALS","valueFrom":{"secretKeyRef":{"key":"leaf-creds","name":"leaf-token"}}},{"name":"AWS_ACCESS_KEY_ID","valueFrom":{"secretKeyRef":{"key":"aws_access_key_id","name":"aws-secret"}}},{"name":"AWS_SECRET_ACCESS_KEY","valueFrom":{"secretKeyRef":{"key":"aws_secret_access_key","name":"aws-secret"}}},{"name":"AWS_DEFAULT_REGION","value":"us-west-2"},{"name":"MD_ARTIFACTS_BUCKET","value":"leaf-unileaf-production-artifacts"},{"name":"STUDIO_DATABASE_ENDPOINT","value":"http://s3-us-west-2.amazonaws.com/"},{"name":"STUDIO_DATABASE_TYPE","value":"s3"},{"name":"OPENAI_API_KEY","valueFrom":{"secretKeyRef":{"key":"OPENAI_KEY","name":"openai-key"}}}],"envFrom":[{"configMapRef":{"name":"run-submission-server-env"}}],"image":"634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-run-submission:6579d0c5e3c2a7a4f9ffc108ee1f89b5069ef055","imagePullPolicy":"Always","name":"run-submission-server","resources":{"limits":{"cpu":"1","memory":"8Gi"}},"terminationMessagePath":"/prod/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/go/.aws","name":"aws-creds","readOnly":true},{"mountPath":"/tmp","name":"tmp-volume"},{"mountPath":"/config","name":"config-volume"}]}],"dnsPolicy":"ClusterFirst","nodeSelector":{"kubernetes.io/os":"linux"},"restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"serviceAccount":"unileaf-account","serviceAccountName":"unileaf-account","terminationGracePeriodSeconds":30,"volumes":[{"name":"aws-creds","secret":{"defaultMode":420,"items":[{"key":"credentials","path":"credentials"},{"key":"config","path":"config"}],"optional":false,"secretName":"unileaf-aws-creds"}},{"emptyDir":{"sizeLimit":"10Gi"},"name":"tmp-volume"},{"emptyDir":{"sizeLimit":"5Gi"},"name":"config-volume"}]}}}}
+  creationTimestamp: "2023-06-01T14:54:33Z"
+  generation: 17
+  labels:
+    app: run-submission-server
+  name: run-submission-server-deployment
+  namespace: neuroai-prod
+  resourceVersion: "121751960"
+  uid: 8e439f9e-94f9-47c6-a51d-6f69ccab0a03
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: run-submission-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2023-10-24T17:11:47Z"
+      creationTimestamp: null
+      labels:
+        app: run-submission-server
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - env:
+        - name: IP_PORT
+          value: 0.0.0.0:30004
+        - name: AWS_BUCKET
+          value: leaf-unileaf-production-artifacts
+        - name: AWS_REGION
+          value: us-west-2
+        - name: UNILEAF_USER
+          value: unileaf-production
+        - name: UNILEAF_WORK_QUEUE
+          value: sqs_studioml_gorunner_cpu_production
+        - name: MD_SERVER_HOST
+          value: metadata-service
+        - name: MD_SERVER_PORT
+          value: "30001"
+        - name: AWS_SHARED_CREDENTIALS_FILE
+          value: /go/.aws/credentials
+        - name: AWS_CONFIG_FILE
+          value: /go/.aws/config
+        - name: ESP_SERVICE_USER
+          valueFrom:
+            secretKeyRef:
+              key: auth0-username
+              name: auth0-creds
+        - name: ESP_SERVICE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: auth0-password
+              name: auth0-creds
+        - name: LEAF_SOURCE_CREDENTIALS
+          valueFrom:
+            secretKeyRef:
+              key: leaf-creds
+              name: leaf-token
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              key: aws_access_key_id
+              name: aws-secret
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: aws_secret_access_key
+              name: aws-secret
+        - name: AWS_DEFAULT_REGION
+          value: us-west-2
+        - name: MD_ARTIFACTS_BUCKET
+          value: leaf-unileaf-production-artifacts
+        - name: STUDIO_DATABASE_ENDPOINT
+          value: http://s3-us-west-2.amazonaws.com/
+        - name: STUDIO_DATABASE_TYPE
+          value: s3
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: OPENAI_API_KEY
+              name: openai-key
+        envFrom:
+        - configMapRef:
+            name: run-submission-server-env
+        image: 634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-run-submission:1.4.13
+        imagePullPolicy: Always
+        name: run-submission-server
+        resources:
+          limits:
+            cpu: "1"
+            memory: 8Gi
+        terminationMessagePath: /prod/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /go/.aws
+          name: aws-creds
+          readOnly: true
+        - mountPath: /tmp
+          name: tmp-volume
+        - mountPath: /config
+          name: config-volume
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/os: linux
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: unileaf-account
+      serviceAccountName: unileaf-account
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: aws-creds
+        secret:
+          defaultMode: 420
+          items:
+          - key: credentials
+            path: credentials
+          - key: config
+            path: config
+          optional: false
+          secretName: unileaf-aws-creds
+      - emptyDir:
+          sizeLimit: 10Gi
+        name: tmp-volume
+      - emptyDir:
+          sizeLimit: 5Gi
+        name: config-volume
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2023-09-18T19:31:05Z"
+    lastUpdateTime: "2023-09-18T19:31:05Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2023-10-20T21:03:45Z"
+    lastUpdateTime: "2023-11-15T23:02:48Z"
+    message: ReplicaSet "run-submission-server-deployment-5c4659c6bf" has successfully
+      progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 17
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

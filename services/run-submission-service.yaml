@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"run-submission-service","namespace":"neuroai-prod"},"spec":{"ports":[{"port":30004,"protocol":"TCP","targetPort":30002}],"selector":{"app":"run-submission-server"},"sessionAffinity":"None","type":"ClusterIP"}}
+  creationTimestamp: "2023-05-16T23:22:15Z"
+  name: run-submission-service
+  namespace: neuroai-prod
+  resourceVersion: "9185"
+  uid: 05ce99af-9275-44c9-902a-52d25ca5cefd
+spec:
+  clusterIP: 10.100.179.242
+  clusterIPs:
+  - 10.100.179.242
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 30004
+    protocol: TCP
+    targetPort: 30002
+  selector:
+    app: run-submission-server
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

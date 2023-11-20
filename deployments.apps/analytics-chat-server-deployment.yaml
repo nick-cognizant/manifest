@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "4"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"analytics-chat-server"},"name":"analytics-chat-server-deployment","namespace":"neuroai-prod"},"spec":{"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"analytics-chat-server"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"analytics-chat-server"}},"spec":{"automountServiceAccountToken":true,"containers":[{"env":[{"name":"AWS_BUCKET","value":"unileaf-production-artifacts"},{"name":"AWS_REGION","value":"us-west-2"},{"name":"AWS_DEFAULT_REGION","value":"us-west-2"}],"image":"634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-analytics-chat:6579d0c5e3c2a7a4f9ffc108ee1f89b5069ef055","imagePullPolicy":"Always","name":"analytics-chat-server","resources":{"limits":{"cpu":"1","memory":"8Gi"}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/tmp","name":"tmp-volume"},{"mountPath":"/config","name":"config-volume"}]}],"dnsPolicy":"ClusterFirst","nodeSelector":{"kubernetes.io/os":"linux"},"restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"serviceAccount":"unileaf-account","serviceAccountName":"unileaf-account","terminationGracePeriodSeconds":30,"volumes":[{"emptyDir":{"sizeLimit":"10Gi"},"name":"tmp-volume"},{"emptyDir":{"sizeLimit":"5Gi"},"name":"config-volume"}]}}}}
+  creationTimestamp: "2023-09-18T20:49:50Z"
+  generation: 4
+  labels:
+    app: analytics-chat-server
+  name: analytics-chat-server-deployment
+  namespace: neuroai-prod
+  resourceVersion: "99105871"
+  uid: 8463a29a-d23d-4c3a-b6fe-a9d2a7463440
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: analytics-chat-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2023-10-06T20:10:19Z"
+      creationTimestamp: null
+      labels:
+        app: analytics-chat-server
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - env:
+        - name: AWS_BUCKET
+          value: leaf-unileaf-production-artifacts
+        - name: AWS_REGION
+          value: us-west-2
+        - name: AWS_DEFAULT_REGION
+          value: us-west-2
+        image: 634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-analytics-chat:1.4.7
+        imagePullPolicy: Always
+        name: analytics-chat-server
+        resources:
+          limits:
+            cpu: "1"
+            memory: 8Gi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
+        - mountPath: /config
+          name: config-volume
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/os: linux
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: unileaf-account
+      serviceAccountName: unileaf-account
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir:
+          sizeLimit: 10Gi
+        name: tmp-volume
+      - emptyDir:
+          sizeLimit: 5Gi
+        name: config-volume
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2023-09-18T20:52:13Z"
+    lastUpdateTime: "2023-09-18T20:52:13Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2023-09-18T20:49:50Z"
+    lastUpdateTime: "2023-10-12T23:40:39Z"
+    message: ReplicaSet "analytics-chat-server-deployment-7798bddcc" has successfully
+      progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 4
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

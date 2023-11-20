@@ -1,0 +1,71 @@
+global:
+  namespace: neuroai-prod
+
+deployments:
+  analyticsChatServer:
+    image: 634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-analytics-chat:1.4.7
+    name: analytics-chat-server
+  dataProfilerServer:
+    image: 634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-data-profiler:1.4.13
+    name: data-profiler-server
+  metadataGateway:
+    image: 634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-gateway-mdserver:1.4.13
+    name: metadata-gateway-server
+  metadataServer:
+    image: 634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-python-mdserver:1.4.13
+    name: pmetadata-server
+  runSubmissionServer:
+    image: 634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-run-submission:1.4.13
+    name: run-submission-server
+  secretsManager:
+    image: 634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-secrets-manager:3219a7031ce52f557014d1670eab8d11e03ea4be
+    name: secrets-manager
+  servingAdapter:
+    image: 634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-serving-adapter:1.4.13
+    name: serving-adapter
+    ports:
+      - name: adapter-grpc
+        containerPort: 30005
+  uiNode:
+    image: 634208487213.dkr.ecr.us-west-2.amazonaws.com/leaf/unileaf-ui-node:1.4.13_production_neuroai_cluster
+    name: ui-node-server
+
+
+
+services:
+  dataProfilerService:
+    name: data-profiler-service
+    ports:
+      - port: 80
+        targetPort: 80
+        protocol: TCP
+  metadataGatewayService:
+    name: metadata-gateway-service
+    ports:
+      - port: 80
+        targetPort: 80
+        protocol: TCP
+  metadataService:
+    name: metadata-service
+    ports:
+      - port: 80
+        targetPort: 80
+        protocol: TCP
+  runSubmissionService:
+    name: run-submission-service
+    ports:
+      - port: 80
+        targetPort: 80
+        protocol: TCP
+  servingAdapterService:
+    name: serving-adapter-service
+    ports:
+      - port: 80
+        targetPort: 80
+        protocol: TCP
+  uiNodeService:
+    name: ui-node-service
+    ports:
+      - port: 80
+        targetPort: 80
+        protocol: TCP
